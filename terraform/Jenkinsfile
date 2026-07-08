@@ -1,0 +1,122 @@
+pipeline {
+
+    agent any
+
+    environment {
+        AWS_DEFAULT_REGION = "ap-south-1"
+        TF_IN_AUTOMATION = "true"
+    }
+
+    options {
+        timestamps()
+        ansiColor('xterm')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                cleanWs()
+
+                git branch: 'main',
+                    url: 'https://github.com/ManojBK18/Observability-end-to-end-Project.git'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir('terraform') {
+                    sh 'terraform init'
+                }
+            }
+        }
+
+        stage('Terraform Format Check') {
+            steps {
+                dir('terraform') {
+                    sh 'terraform fmt -check'
+                }
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                dir('terraform') {
+                    sh 'terraform validate'
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds']
+                ]) {
+
+                    dir('terraform') {
+                        sh '''
+                            terraform plan \
+                            -out=tfplan
+                        '''
+                    }
+
+                }
+            }
+        }
+
+        stage('Archive Plan') {
+            steps {
+                archiveArtifacts artifacts: 'terraform/tfplan',
+                                 fingerprint: true
+            }
+        }
+
+        stage('Manual Approval') {
+            steps {
+                input(
+                    message: 'Apply Terraform Infrastructure?',
+                    ok: 'Deploy'
+                )
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds']
+                ]) {
+
+                    dir('terraform') {
+                        sh '''
+                            terraform apply tfplan
+                        '''
+                    }
+
+                }
+
+            }
+        }
+
+    }
+
+    post {
+
+        success {
+            echo "Terraform deployment completed successfully."
+        }
+
+        failure {
+            echo "Terraform deployment failed."
+        }
+
+        always {
+            cleanWs()
+        }
+
+    }
+
+}
