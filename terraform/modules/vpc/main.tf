@@ -17,7 +17,7 @@ resource "aws_internet_gateway" "igw" {
 
   tags = {
     Name = var.igw_name
-    }
+  }
 
 }
 
@@ -31,7 +31,7 @@ resource "aws_subnet" "public" {
 
   tags = {
     Name = "${aws_vpc.eks.tags["Name"]}-public-${count.index + 1}"
-    
+
   }
 }
 
@@ -44,7 +44,7 @@ resource "aws_subnet" "private" {
 
   tags = {
     Name = "${aws_vpc.eks.tags["Name"]}-private-${count.index + 1}"
-    
+
   }
 }
 
@@ -68,10 +68,10 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_eip" "nat" {
-    
-    tags = {
-        Name = var.nat_eip
-    } 
+
+  tags = {
+    Name = var.nat_eip
+  }
 }
 
 resource "aws_nat_gateway" "nat" {

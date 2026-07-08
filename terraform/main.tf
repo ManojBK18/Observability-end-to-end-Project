@@ -3,11 +3,11 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "./modules/vpc"
+  source   = "./modules/vpc"
   vpc_name = "observability-vpc"
   igw_name = "observability-igw"
   nat_name = "observability-nat-gateway"
-  nat_eip = "observability-nat-eip"
+  nat_eip  = "observability-nat-eip"
 }
 
 module "eks" {

@@ -16,4 +16,4 @@ variable "nat_name" {
 variable "nat_eip" {
   description = "Name of the NAT Gateway EIP."
   type        = string
-} 
+}

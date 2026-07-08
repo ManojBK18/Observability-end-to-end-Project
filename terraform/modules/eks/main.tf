@@ -44,8 +44,8 @@ resource "aws_eks_node_group" "example" {
   cluster_name    = aws_eks_cluster.eks.name
   node_group_name = "${var.cluster_name}-node-group"
   node_role_arn   = aws_iam_role.node_group.arn
-  subnet_ids = var.private_subnet_ids
-  
+  subnet_ids      = var.private_subnet_ids
+
   scaling_config {
     desired_size = 2
     max_size     = 4
@@ -53,14 +53,14 @@ resource "aws_eks_node_group" "example" {
   }
 
   instance_types = ["c7i-flex.large"]
-  disk_size     = 20
+  disk_size      = 20
 
   depends_on = [
-        aws_iam_role_policy_attachment.node_group_AmazonEKSWorkerNodePolicy,
-        aws_iam_role_policy_attachment.node_group_AmazonEKS_CNI_Policy,
-        aws_iam_role_policy_attachment.node_group_AmazonEC2ContainerRegistryReadOnly,
-    ]
-}   
+    aws_iam_role_policy_attachment.node_group_AmazonEKSWorkerNodePolicy,
+    aws_iam_role_policy_attachment.node_group_AmazonEKS_CNI_Policy,
+    aws_iam_role_policy_attachment.node_group_AmazonEC2ContainerRegistryReadOnly,
+  ]
+}
 
 resource "aws_iam_role" "node_group" {
   name = "eks-node-group-example"
@@ -97,16 +97,16 @@ resource "aws_iam_role_policy_attachment" "node_group_AmazonEC2ContainerRegistry
 }
 
 resource "aws_eks_addon" "vpc_cni" {
-  cluster_name             = aws_eks_cluster.eks.name
-  addon_name               = "vpc-cni"
+  cluster_name = aws_eks_cluster.eks.name
+  addon_name   = "vpc-cni"
 }
 
 resource "aws_eks_addon" "coredns" {
-  cluster_name  = aws_eks_cluster.eks.name
-  addon_name    = "coredns"
+  cluster_name = aws_eks_cluster.eks.name
+  addon_name   = "coredns"
 }
 
 resource "aws_eks_addon" "kube_proxy" {
-  cluster_name  = aws_eks_cluster.eks.name
-  addon_name    = "kube-proxy"
+  cluster_name = aws_eks_cluster.eks.name
+  addon_name   = "kube-proxy"
 }
